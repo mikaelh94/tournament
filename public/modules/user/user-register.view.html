@@ -1,0 +1,64 @@
+<h1 class="page-title">User Register</h1>
+
+<form class="form-horizontal" name="newUserForm" ng-submit="createUser()" novalidate>
+
+    <div class="form-group" show-errors>
+        <label for="newUserName" class="col-sm-4 control-label">Username</label>
+        <div class="col-sm-5">
+            <input  type="text"
+                    id="newUserName"
+                    class="form-control"
+                    name="username"
+                    ng-model="newUser.username"
+                    required
+                    placeholder="Username"></input>
+        </div>
+        <div ng-if="showMessages" ng-messages="newUserForm.username.$error">
+            <p class="help-block" ng-message="required">Username is required</p>
+        </div>
+    </div>
+
+    <div class="form-group" show-errors>
+        <label for="newUserPassword" class="col-sm-4 control-label">Password</label>
+        <div class="col-sm-5">
+            <input  type="password"
+                    id="newUserPassword"
+                    class="form-control"
+                    name="password"
+                    ng-model="newUser.password"
+                    required></input>
+        </div>
+
+        <div  ng-if="showMessages" ng-messages="newUserForm.password.$error">
+            <p class="help-block" ng-message="required">Password is required</p>
+        </div>
+    </div>
+
+    <div class="form-group" show-errors>
+        <label for="newUserEmail" class="col-sm-4 control-label">Email</label>
+        <div class="col-sm-5">
+            <input  type="email"
+                    id="newUserEmail"
+                    class="form-control"
+                    name="email"
+                    ng-model="newUser.email"
+                    required
+                    placeholder="email"></input>
+        </div>
+
+        <div  ng-if="showMessages" ng-messages="newUserForm.email.$error">
+            <p class="help-block" ng-message="required">Email is required</p>
+            <p class="help-block" ng-message="email">Email is not valid</p>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-8">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+
+
+<a ui-sref="home" class="btn btn-primary">Back</a>

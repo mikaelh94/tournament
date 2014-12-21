@@ -1,0 +1,17 @@
+{
+    "tournaments": [
+        {
+            "id": 0,
+            "name": "myName",
+            "createdAt": "13/12/2014",
+            "matchToWin": 1,
+            "playersCount": 4,
+            "playersLeft": 0,
+            "currentRound": 2, 
+            "players": [0,1,2,3],
+            "round1": [0,1],
+            "round2": [2],
+            "winner": 3
+        }
+    ]
+}
