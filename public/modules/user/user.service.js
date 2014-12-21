@@ -2,13 +2,17 @@ angular.module('tournamentApp.userModule')
 
     .factory('userService',[
         '$resource',
-        function($resource){
-            // $resource('/users/:id');
+        '$state',
+        '$rootScope',
+        function($resource, $state, $rootScope){
             return {
 
                 register: function(data) {
-                    return $resource('/auth/register').save(data, function(response) {
+                    var self = this;
 
+                    return $resource('/auth/register').save(data, function(response) {
+                        self.setCurrentUser(response);
+                        $state.go('home');
                     });
                 },
 
@@ -18,9 +22,36 @@ angular.module('tournamentApp.userModule')
                     });
                 },
 
-                getCurrentUser: function(callback) {
-                    return $resource('/auth/user').get(function(data) {
-                        callback(data);
+                logout: function() {
+                    return $resource('/auth/logout').get(function(response) {
+                        $rootScope.isLogged = false;
+                        $rootScope.currentUser = null;
+                        $state.go('home');
+                    });
+                },
+
+                setCurrentUser: function(user) {
+                    $rootScope.isLogged = false;
+                    $rootScope.currentUser = null;
+
+                    if (user && typeof user._id !== 'undefined'
+                             && typeof user.username !== 'undefined'
+                             && typeof user.email !== 'undefined') {
+
+                        $rootScope.currentUser = {
+                            id: user._id,
+                            username: user.username,
+                            email: user.email
+                        };
+                        $rootScope.isLogged = true;
+                    }
+                },
+
+                getCurrentUser: function() {
+                    var self = this;
+
+                    return $resource('/auth/user').get(function(response) {
+                        self.setCurrentUser(response);
                     });
                 }
             };

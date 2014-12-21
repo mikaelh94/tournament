@@ -52,6 +52,11 @@ module.exports = function(passport) {
     res.json(req.user);
   });
 
+  router.get('/auth/logout', function(req, res) {
+    req.logout();
+    res.json(req.user);
+  });
+
   router.get('/auth/user', function(req, res) {
     res.json(req.user);
   });

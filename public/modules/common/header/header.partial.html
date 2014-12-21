@@ -1,5 +1,5 @@
-<header ng-controller="HeaderCtrl">
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+<header id="header" ng-controller="HeaderCtrl">
+    <nav class="navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container-fluid">
             
             <div class="navbar-header">
@@ -16,11 +16,16 @@
 
 
                 <ul class="nav navbar-nav">
-                    <li class="active"><a ui-sref="tournamentCreate">Create <span class="sr-only">(current)</span></a></li>
+                    <li ui-sref-active="active"><a ui-sref="home">Home</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tournamentCreate">Create Tournament</a></li>
                 </ul>
+                
 
+                <!-- user is logged => Login Form -->
+                <div ng-if="!$root.isLogged" header-login-form></div>
 
-                <div login-form></div>
+                <!-- user not logged => user info -->
+                <div ng-if="$root.isLogged" header-user-info></div>
 
 
             </div>

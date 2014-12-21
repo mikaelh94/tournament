@@ -1,0 +1,37 @@
+<ul class="nav navbar-nav navbar-right">
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Login <span class="caret"></span></a>
+        <div class="dropdown-menu">
+
+
+            <form id="header-login" name="userLoginForm" ng-submit="login()" novalidate>
+                <div class="form-group">
+                    <input type="text"
+                           id="userLoginUsername"
+                           class="form-control"
+                           name="username"
+                           ng-model="userLogin.username"
+                           required
+                           placeholder="Username">
+                       
+                   <div ng-if="showMessages" ng-messages="newUserForm.username.$error">
+                       <p class="help-block" ng-message="required">Username is required</p>
+                   </div>
+                </div>
+                <div class="form-group">
+                    <input type="password"
+                           id="userLoginPassword"
+                           class="form-control"
+                           name="password"
+                           ng-model="userLogin.password"
+                           required
+                           placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary">Connect</button>
+            </form>
+
+
+        </div>
+    </li>
+    <li ui-sref-active="active"><a ui-sref="userRegister" class="">Register</a></li>
+</ul>

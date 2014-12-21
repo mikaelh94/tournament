@@ -2,7 +2,7 @@
 
 <form class="form-horizontal" name="newUserForm" ng-submit="createUser()" novalidate>
 
-    <div class="form-group" show-errors>
+    <div class="form-group">
         <label for="newUserName" class="col-sm-4 control-label">Username</label>
         <div class="col-sm-5">
             <input  type="text"
@@ -13,12 +13,12 @@
                     required
                     placeholder="Username"></input>
         </div>
-        <div ng-if="showMessages" ng-messages="newUserForm.username.$error">
+        <div ng-if="newUserForm.$submitted" ng-messages="newUserForm.username.$error">
             <p class="help-block" ng-message="required">Username is required</p>
         </div>
     </div>
 
-    <div class="form-group" show-errors>
+    <div class="form-group">
         <label for="newUserPassword" class="col-sm-4 control-label">Password</label>
         <div class="col-sm-5">
             <input  type="password"
@@ -26,15 +26,16 @@
                     class="form-control"
                     name="password"
                     ng-model="newUser.password"
-                    required></input>
+                    required
+                    placeholder="Password"></input>
         </div>
 
-        <div  ng-if="showMessages" ng-messages="newUserForm.password.$error">
+        <div  ng-if="newUserForm.$submitted" ng-messages="newUserForm.password.$error">
             <p class="help-block" ng-message="required">Password is required</p>
         </div>
     </div>
 
-    <div class="form-group" show-errors>
+    <div class="form-group">
         <label for="newUserEmail" class="col-sm-4 control-label">Email</label>
         <div class="col-sm-5">
             <input  type="email"
@@ -46,7 +47,7 @@
                     placeholder="email"></input>
         </div>
 
-        <div  ng-if="showMessages" ng-messages="newUserForm.email.$error">
+        <div  ng-if="newUserForm.$submitted" ng-messages="newUserForm.email.$error">
             <p class="help-block" ng-message="required">Email is required</p>
             <p class="help-block" ng-message="email">Email is not valid</p>
         </div>

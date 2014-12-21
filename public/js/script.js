@@ -50,31 +50,6 @@ var tournamentModule = angular.module('tournamentApp', [
 ;
 angular.module('tournamentApp.commonModule', [])
 
-    .directive('showErrors', function() {
-        return {
-            restrict: 'A',
-            require:  '^form',
-            link: function (scope, el, attrs, formCtrl) {
-                // find the text box element, which has the 'name' attribute
-                var inputEl   = el[0].querySelector("[name]");
-                // convert the native text box element to an angular element
-                var inputNgEl = angular.element(inputEl);
-                // get the name on the text box so we know the property to check
-                // on the form controller
-                var inputName = inputNgEl.attr('name');
-
-                // only apply the has-error class after the user leaves the text box
-                inputNgEl.bind('focus', function() {
-                    el.removeClass('has-error');
-                });
-
-                scope.$on('show-errors-check-validity', function() {
-                    el.toggleClass('has-error', formCtrl[inputName].$invalid);
-                });
-            }
-        };
-    })
-
 ;
 angular.module('tournamentApp.tournamentModule', []);
 angular.module('tournamentApp.userModule', []);
@@ -86,10 +61,7 @@ angular.module('tournamentApp.commonModule')
         'userService',
         function($scope, $rootScope, userService){
 
-            userService.getCurrentUser(function(user) {
-                $rootScope.currentUser = user;
-                $rootScope.isLogged = !!user;
-            });
+            userService.getCurrentUser();
         }
     ])
 
@@ -97,15 +69,61 @@ angular.module('tournamentApp.commonModule')
 angular.module('tournamentApp.commonModule')
 
 
-    .directive('tournamentHeader', function() {
-        return {
-            restrict: 'EAC',
-            templateUrl: '/modules/common/header/header.partial.html',
-            link: function (scope, el, attrs) {
+    .directive('tournamentHeader', [
+        function() {
+            return {
+                restrict: 'EA',
+                templateUrl: '/modules/common/header/header.partial.html',
+                replace: true,
+                link: function (scope, el, attrs) {
 
-            }
-        };
-    })
+                }
+            };
+        }
+    ])
+
+    .directive('headerLoginForm', [
+        'userService',
+        function(userService) {
+            return {
+                restrict: 'EA',
+                templateUrl: '/modules/common/header/header-login-form.partial.html',
+                replace: true,
+                link: function (scope, el, attrs) {
+                    scope.login = function() {
+
+                        var user = {
+                            username: 'toto',
+                            password: 'tata'
+                        }
+
+                        userService.login(user);
+
+                    };
+
+                    //scope.currentUser = $root.currentUser;
+                }
+            };
+        }
+    ])
+
+
+
+    .directive('headerUserInfo', [
+        'userService',
+        function(userService) {
+            return {
+                restrict: 'EA',
+                templateUrl: '/modules/common/header/header-user-info.partial.html',
+                replace: true,
+                link: function (scope, el, attrs) {
+                    scope.logout = function() {
+                        userService.logout();
+                    };
+                }
+            };
+        }
+    ])
 
 ;
 angular.module('tournamentApp.commonModule')
@@ -186,17 +204,12 @@ angular.module('tournamentApp.userModule')
         }
     ])
 
-
     .controller('UserRegisterCtrl', [
         '$scope',
         'userService',
         function($scope, userService){
 
             $scope.createUser = function() {
-
-                $scope.$broadcast('show-errors-check-validity');
-                $scope.showMessages = true;
-
                 if ($scope.newUserForm.$invalid) { return; }
 
                 userService.register($scope.newUser);
@@ -208,42 +221,23 @@ angular.module('tournamentApp.userModule')
 angular.module('tournamentApp.userModule')
 
 
-    .directive('loginForm', [
-        'userService',
-        function(userService) {
-            return {
-                restrict: 'EAC',
-                templateUrl: '/modules/user/user-login.partial.html',
-                link: function (scope, el, attrs) {
-                    scope.login = function() {
-
-                        var user = {
-                            username: 'toto',
-                            password: 'tata'
-                        }
-
-                        userService.login(user);
-
-                    };
-
-                    //scope.currentUser = $root.currentUser;
-                }
-            };
-        }
-    ])
 
 ;
 angular.module('tournamentApp.userModule')
 
     .factory('userService',[
         '$resource',
-        function($resource){
-            // $resource('/users/:id');
+        '$state',
+        '$rootScope',
+        function($resource, $state, $rootScope){
             return {
 
                 register: function(data) {
-                    return $resource('/auth/register').save(data, function(response) {
+                    var self = this;
 
+                    return $resource('/auth/register').save(data, function(response) {
+                        self.setCurrentUser(response);
+                        $state.go('home');
                     });
                 },
 
@@ -253,9 +247,36 @@ angular.module('tournamentApp.userModule')
                     });
                 },
 
-                getCurrentUser: function(callback) {
-                    return $resource('/auth/user').get(function(data) {
-                        callback(data);
+                logout: function() {
+                    return $resource('/auth/logout').get(function(response) {
+                        $rootScope.isLogged = false;
+                        $rootScope.currentUser = null;
+                        $state.go('home');
+                    });
+                },
+
+                setCurrentUser: function(user) {
+                    $rootScope.isLogged = false;
+                    $rootScope.currentUser = null;
+
+                    if (user && typeof user._id !== 'undefined'
+                             && typeof user.username !== 'undefined'
+                             && typeof user.email !== 'undefined') {
+
+                        $rootScope.currentUser = {
+                            id: user._id,
+                            username: user.username,
+                            email: user.email
+                        };
+                        $rootScope.isLogged = true;
+                    }
+                },
+
+                getCurrentUser: function() {
+                    var self = this;
+
+                    return $resource('/auth/user').get(function(response) {
+                        self.setCurrentUser(response);
                     });
                 }
             };
