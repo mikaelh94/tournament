@@ -1,0 +1,15 @@
+<div id="tournament-diagram" class="row">
+
+  <div class="col-sm-2 col-md-{{ (12-rounds.length*3)/2 }} hidden-xs"></div>
+
+  <div class="col-xs-{{12/rounds.length}} col-sm-{{8/rounds.length}} col-md-3 diagram-column column-{{$index}}"
+       ng-repeat="round in rounds | orderBy:'-_id'">
+
+    <div ng-repeat="game in round.games" class="diagram-game">
+      <p>{{game.player1.username}}</p>
+      <p>{{game.player2.username}}</p>
+    </div>
+
+  </div>
+
+</div>

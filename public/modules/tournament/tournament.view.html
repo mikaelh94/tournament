@@ -1,1 +1,55 @@
-<h1>Tournament</h1>
+<h1 class="page-title">Tournament: {{t.name}}</h1>
+
+<div tournament-diagram></div>
+
+<div class="row">
+
+  <div class="col-md-8">
+    <h3 class="h3">Infos</h3>
+    <table class="table table-striped table-bordered">
+      <tr>
+        <td>Name <span class="pull-right">{{t.name}}</span></td>
+      </tr>
+      <tr>
+        <td>Date <span class="pull-right">{{t.createdAt | date: 'dd/MM/yyyy'}}</span></td>
+      </tr>
+      <tr>
+        <td>Status <span class="pull-right">{{t.status}}</span></td>
+      </tr>
+      <tr>
+        <td>Match to win <span class="pull-right">{{t.matchToWin}}</span></td>
+      </tr>
+      <tr ng-if="isActive">
+        <td>Current round <span class="pull-right">{{t.currentRound}}</span></td>
+      </tr>
+      <tr>
+        <td>Max players <span class="pull-right">{{t.playersMax}}</span></td>
+      </tr>
+      <tr>
+        <td>Total players <span class="pull-right">{{t.playersCount}}</span></td>
+      </tr>
+      <tr>
+        <td ng-if="isActive">Players remaining <span class="pull-right">{{t.playersLeft}}</span></td>
+      </tr>
+      <tr ng-if="t.winner">
+        <td>Winner <span class="pull-right">{{t.winner}}</span></td>
+      </tr>
+    </table>
+
+    <div ng-if="$root.isLogged && !isActive" class="clearfix">
+      <a ng-show="!userIsPlayer && t.playersCount < t.playersMax" class="btn btn-primary" ng-click="subscribe()">Subscribe</a>
+      <a ng-show="userIsPlayer" class="btn btn-primary" ng-click="unsubscribe()">Unsubscribe</a>
+      <a ng-show="t.playersCount >= 2" class="btn btn-lg btn-primary pull-right" ng-click="start()">Start</a>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <h3 class="h3">Players</h3>
+    <table class="table table-striped table-bordered">
+      <tr ng-repeat="player in t.players">
+        <td ng-class="{ 'text-primary': player._id === $root.currentUser.id }">{{player.username}} <span class="pull-right">{{player.points}} Pts</span></td>
+      </tr>
+    </table>
+  </div>
+
+</div>

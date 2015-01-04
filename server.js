@@ -1,20 +1,19 @@
+// modules =================================================
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var app = express();
 
 
 
+
+// configuration ===========================================
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -23,7 +22,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-// Configuring Passport
+
+
+// Passport / Session
 var passport = require('passport');
 var expressSession = require('express-session');
 app.use(expressSession({
@@ -34,19 +35,23 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
- // Using the flash middleware provided by connect-flash to store messages in session and displaying in templates
-var flash = require('connect-flash');
-app.use(flash());
-
-// Initialize Passport
 var initPassport = require('./passport/init');
 initPassport(passport);
 
 
 
 // Routes
-var routes = require('./routes/index')(passport);
-app.use('/', routes);
+var indexRoutes = require('./routes/index')();
+var tournamentsRoutes = require('./routes/tournaments')();
+var usersRoutes = require('./routes/users')();
+var authRoutes = require('./routes/auth')(passport);
+
+app.use('/', indexRoutes);
+app.use('/tournaments', tournamentsRoutes);
+app.use('/users', usersRoutes);
+app.use('/auth', authRoutes);
+
+
 
 app.use('/bower_components',  express.static(path.join(__dirname + '/bower_components')));
 
@@ -92,6 +97,8 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/tournament');
 
 
+
+app.listen( process.env.PORT || 3000 );
+
+
 module.exports = app;
-
-

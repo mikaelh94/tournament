@@ -11,9 +11,9 @@
     </tr>
     
     <tr ng-repeat="t in tournaments">
-        <td>{{t.name}}</td>
-        <td>{{t.createdAt}}</td>
-        <td>{{t.currentRound}}</td>
+        <td><a ui-sref="tournament({id: t._id})">{{t.name}}</a></td>
+        <td>{{t.createdAt | date: 'dd/MM/yyyy'}}</td>
+        <td>{{t.status}}</td>
         <td>{{t.playersCount}}</td>
         <td>{{t.playersLeft}}</td>
         <td>{{t.winner}}</td>

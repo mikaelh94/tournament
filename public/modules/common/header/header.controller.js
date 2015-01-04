@@ -3,10 +3,10 @@ angular.module('tournamentApp.commonModule')
     .controller('HeaderCtrl', [
         '$scope',
         '$rootScope',
-        'userService',
-        function($scope, $rootScope, userService){
+        'authService',
+        function($scope, $rootScope, authService){
 
-            userService.getCurrentUser();
+            authService.getCurrentUser();
         }
     ])
 

@@ -1,21 +1,43 @@
 angular.module('tournamentApp.userModule')
 
-    .controller('UserCtrl', [
+    .controller('UserListCtrl', [
         '$scope',
-        function($scope){
+        'userList',
+        function($scope, userList){
+
+            $scope.users = userList;
+
+        }
+    ])
+
+    .controller('UserProfileCtrl', [
+        '$scope',
+        '$rootScope',
+        '$stateParams',
+        'userService',
+        function($scope, $rootScope, $stateParams, userService){
+
+            $scope.user = userService.get({id: $stateParams.id});
 
         }
     ])
 
     .controller('UserRegisterCtrl', [
         '$scope',
-        'userService',
-        function($scope, userService){
+        'authService',
+        function($scope, authService){
 
             $scope.createUser = function() {
                 if ($scope.newUserForm.$invalid) { return; }
 
-                userService.register($scope.newUser);
+                authService.register($scope.newUser)
+                    .$promise.then(
+                        function(response) {
+                            if (!response.user && response.info) {
+                                $scope.registerError = response.info;
+                            }
+                        }
+                    );
             };
         }
     ])
