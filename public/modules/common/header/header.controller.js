@@ -7,6 +7,7 @@ angular.module('tournamentApp.commonModule')
         function($scope, $rootScope, authService){
 
             authService.getCurrentUser();
+
         }
     ])
 

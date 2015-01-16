@@ -1,21 +1,160 @@
+@diagram-primary: #222;
+@diagram-secondary: #bbb;
+@diagram-item-height: 2.4rem;
+@diagram-line-width: .2rem;
+@diagram-line-radius: 1rem;
+
+
+
+@winner-text-color: #fff;
+@loser-text-color: #888;
+@loser-bg-color: #333;
+
 #tournament-diagram {
   .diagram-column {
+    padding-left: 0;
+    padding-right: 0;
+    &.column-0 {
+      .diagram-game:before {
+        content: none;
+      }
+    }
     &.column-1 {
-      padding-top: 6rem;
+      .diagram-game {
+        padding: @diagram-item-height * 2 0;
+        &:before,
+        &:after {
+          height: @diagram-item-height * 3 + @diagram-line-width/2;
+        }
+      }
+    }
+    &.column-2 {
+      .diagram-game {
+        padding: @diagram-item-height * 5 0;
+        &:before,
+        &:after {
+          height: @diagram-item-height * 6 + @diagram-line-width/2;
+        }
+        &.winner {
+          padding: @diagram-item-height * 2.5 0;
+        }
+      }
+    }
+    &.column-3 {
+      .diagram-game {
+        padding: @diagram-item-height * 11 0;
+        &:before,
+        &:after {
+          height: @diagram-item-height * 12 + @diagram-line-width/2;
+        }
+        &.winner {
+          padding: @diagram-item-height * 5.5 0;
+        }
+      }
+    }
+    &.last {
+      .diagram-game:after {
+        border-right: none;
+        border-radius: 0;
+      }
     }
   }
-  .diagram-game {
-    margin: 4rem -0px;
+  
+}
+
+.diagram-game {
+  padding: @diagram-item-height/2 0;
+  position: relative;
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    width: 15%;
+    height: @diagram-item-height*1.5 + @diagram-line-width/2;
+    bottom: 0;
+    right: 0;
+    border-top: @diagram-line-width solid @diagram-primary;
+    border-right: @diagram-line-width solid @diagram-primary;
+    border-top-right-radius: @diagram-line-radius;
+  }
+  &:before {
+    border-right: none;
+    border-radius: 0;
+    right: auto;
+    left: 0;
+  }
+
+  &.bottom-tree:after {
+    top: 0;
+    bottom: auto;
+    border-top: none;
+    border-bottom: @diagram-line-width solid @diagram-primary;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: @diagram-line-radius;
+  }
+  .game-box {
     width: 70%;
-    background-color: #222;
-    p {
-      margin: 0;
-      padding: 0 5%;
-      height: 4rem;
-      line-height: 4rem;
-      color: #fff;
-      &:first-child {
-        border-bottom: 1px solid #666;
+    margin: 0 auto;
+    background-color: @diagram-primary;
+    &.scorable{
+      cursor: pointer;
+      &:hover {
+        box-shadow:  4px  4px 8px rgba(102, 175, 233, 0.5),
+                    -4px -4px 8px rgba(102, 175, 233, 0.5),
+                     4px -4px 8px rgba(102, 175, 233, 0.5),
+                    -4px  4px 8px rgba(102, 175, 233, 0.5);
+        p {
+          color: #fff;
+        }
+      }
+    }
+    p span {
+      display: inline-block;
+      vertical-align: middle;
+      width: 16%;
+      text-align: right;
+      color: @loser-text-color;
+      &.score-success {
+        color: @winner-text-color;
+      }
+    }
+    .game-box-winner {
+      color: @winner-text-color;
+    }
+    .game-box-loser {
+      color: @loser-text-color;
+      background-color: @loser-bg-color;
+    }
+  }
+  p {
+    margin: 0;
+    padding: 0 5%;
+    height: @diagram-item-height;
+    line-height: @diagram-item-height - (@diagram-line-width/2);
+    color: @diagram-secondary;
+    border-top: @diagram-line-width/2 solid @diagram-secondary;
+    &:first-child {
+      border-top: none;
+      border-bottom: @diagram-line-width/2 solid @diagram-secondary;
+      line-height: @diagram-item-height;
+    }
+
+  }
+
+
+  &.winner {
+    &:before,
+    &:after {
+      content: none;
+    }
+    .game-box {
+      background: none;
+      margin: -@diagram-line-width 0 0 10%;
+      p {
+        color: @diagram-primary;
+        border: none;
+        height: @diagram-item-height*1.2;
+        line-height: @diagram-item-height*1.2;
       }
     }
   }

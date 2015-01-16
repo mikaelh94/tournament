@@ -4,7 +4,8 @@ angular.module('tournamentApp.userModule')
     '$resource',
     function($resource) {
       return $resource('/users/:id', { id:'@id' }, {
-        getAll: { method: 'GET', params: {}, isArray: true }
+        getAll: { method: 'GET', params: {}, isArray: true },
+        setPoints: { method: 'PUT', data: {points: '@points'} },
       });
     }
   ])
@@ -23,7 +24,6 @@ angular.module('tournamentApp.userModule')
             function(response) {
               if (response.user) {
                 self.setCurrentUser(response.user);
-                $state.go('home');
               }
             }
           );
@@ -36,6 +36,7 @@ angular.module('tournamentApp.userModule')
             function(response) {
               if (response.user) {
                 self.setCurrentUser(response.user);
+                return response.user.$promise;
               }
             }
           );

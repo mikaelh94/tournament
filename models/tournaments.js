@@ -7,7 +7,8 @@ var GameSchema = new mongoose.Schema({
     player1: { type: mongoose.Schema.ObjectId, ref: 'UserModel'},
     player2: { type: mongoose.Schema.ObjectId, ref: 'UserModel'},
     scores: [String],
-    winner: { type: mongoose.Schema.ObjectId, ref: 'UserModel'},
+    winner: Number,
+    winnerId: { type: mongoose.Schema.ObjectId, ref: 'UserModel'},
     nextGame: Number
 });
 
@@ -29,7 +30,8 @@ var TournamentSchema = new mongoose.Schema({
     players: [
       { type: mongoose.Schema.ObjectId, ref: 'UserModel'}
     ],
-    rounds: [RoundSchema]
+    rounds: [RoundSchema],
+    winner: { type: mongoose.Schema.ObjectId, ref: 'UserModel'}
 });
 
 mongoose.model('TournamentModel', TournamentSchema);

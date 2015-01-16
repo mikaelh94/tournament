@@ -11,11 +11,13 @@ module.exports = function() {
 
   // get all
   router.get('/', function(req, res, next) {
-    TournamentModel.find(function(err, tournaments){
-      if(err){ return next(err); }
+    TournamentModel.find()
+     .populate({ path: 'winner' })
+     .exec(function(err, tournament){
+       if(err){ console.log(err); }
 
-      res.json(tournaments);
-    });
+       res.json(tournament);
+     });
   });
 
 
@@ -34,13 +36,12 @@ module.exports = function() {
   // get one
   router.get('/:id', function(req, res) {
     TournamentModel.findById(req.params.id)
-    .populate({ path: 'players rounds.games.player1 rounds.games.player2 rounds.games.winner' })
+    .populate({ path: 'players rounds.games.player1 rounds.games.player2 rounds.games.winnerId winner' })
     .exec(function(err, tournament){
-      if(err){ return next(err); }
+      if(err){ console.log(err); }
 
       res.json(tournament);
-    })
-    ;
+    });
   });
 
 
@@ -49,7 +50,72 @@ module.exports = function() {
     TournamentModel.findById(req.params.id, function(err, tournament){
       if(err){ return next(err); }
 
-      if (req.body.rounds.length && tournament.status === 'pending') {
+      // reset
+      if (req.body.reset) {
+        tournament.status = 'pending';
+        tournament.players = [];
+        tournament.rounds = [];
+        tournament.playersCount = 0;
+        tournament.playersLeft = 0;
+        tournament.currentRound = 0;
+        tournament.winner = undefined;
+      }
+
+      //set single game scores
+      if (req.body.scores) {
+        var scoresObj = req.body.scores;
+
+        var round = tournament.rounds.id(scoresObj.roundId),
+            game  = round.games.id(scoresObj.gameId);
+
+        for (var key in scoresObj.scores) {
+          game.scores.push(scoresObj.scores[key].player1 + ':' + scoresObj.scores[key].player2);
+        }
+        game.winnerId = scoresObj.winnerId;
+        game.winner = scoresObj.winner;
+
+
+        tournament.playersLeft = tournament.playersLeft-1;
+
+        // check if ounr is finished
+        var isRoundOver = true;
+        for (var i = 0, len = round.games.length; i < len; i++) {
+           if (!round.games[i].winner) {
+            isRoundOver = false;
+           }
+        };
+
+        if (isRoundOver) {
+          tournament.isFinished = true;
+          tournament.currentRound = tournament.currentRound-1;
+        }
+
+        // set next game's players
+        if (game.nextGame) {
+          var nextGame = tournament
+                      .rounds.id(scoresObj.roundId-1)
+                      .games.id(game.nextGame);
+
+          // gameId is even => winnerId is next game player1
+          if (scoresObj.gameId % 2 == 0) {
+            nextGame.player1 = scoresObj.winnerId;
+          } else {
+            nextGame.player2 = scoresObj.winnerId;
+          }
+
+        // tournament is over
+        } else {
+          tournament.winner = scoresObj.winnerId;
+          tournament.status = 'finished';
+        }
+        
+
+
+
+      }
+
+      // set start rounds
+      if (req.body.rounds && tournament.status === 'pending') {
         var rounds = req.body.rounds;
 
         // rounds
@@ -72,7 +138,7 @@ module.exports = function() {
 
             // final only
             } else {
-              var gameItem = {_id: 0};
+              var gameItem = {_id: 1};
             }
 
             games.push(gameItem);
@@ -93,9 +159,9 @@ module.exports = function() {
         if(err){
           console.log(err);
         } else {
-          TournamentModel.populate(tournament, { path: 'players rounds.games.player1 rounds.games.player2 rounds.games.winner' },
+          TournamentModel.populate(tournament, { path: 'players rounds.games.player1 rounds.games.player2 rounds.games.winnerId winner' },
             function(err, tournament) {
-              if(err){ return next(err); }
+              if(err){ console.log(err); }
 
               return res.json(tournament);
             }); 

@@ -27,6 +27,22 @@ module.exports = function() {
     });
   });
 
+  router.put('/:id', function(req, res) {
+    UserModel.findById(req.params.id, function(err, user){
+      if(err){ return next(err); }
+
+      if (req.body.points) {
+        user.points = req.body.points;
+      }
+
+      user.save(function(err, user){
+        if(err){ return next(err); }
+
+        res.json(user);
+      });
+    });
+  });
+
 
   return router;
 };

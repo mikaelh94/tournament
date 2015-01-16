@@ -1,15 +1,39 @@
 <div id="tournament-diagram" class="row">
 
-  <div class="col-sm-2 col-md-{{ (12-rounds.length*3)/2 }} hidden-xs"></div>
+  <div ng-class="{'col-xs-1': (t.rounds.length === 4) }">
+    
+  </div>
 
-  <div class="col-xs-{{12/rounds.length}} col-sm-{{8/rounds.length}} col-md-3 diagram-column column-{{$index}}"
-       ng-repeat="round in rounds | orderBy:'-_id'">
+  <div class="col-xs-{{ 12 / (t.rounds.length+1) | number:0 }}  diagram-column column-{{$index}}"
+       ng-class="{'last' : $last}"
+       ng-repeat="round in t.rounds | orderBy:'-_id'">
 
-    <div ng-repeat="game in round.games" class="diagram-game">
-      <p>{{game.player1.username}}</p>
-      <p>{{game.player2.username}}</p>
+    <div ng-repeat="game in round.games" class="diagram-game" ng-class="{'bottom-tree': $odd}">
+      <div class="game-box" ng-click="scorePopin(t._id, round._id, game, t.matchToWin)" ng-class="{'scorable': game.scores.length === 0 && game.player1 && game.player2}">
+        <p ng-class="{'game-box-winner': game.winner === 1, 'game-box-loser': game.winner === 2}">
+          {{game.player1.username}} 
+          <span ng-if="game.scores.length" ng-repeat="score in game.scores.slice().reverse() track by $index" class="pull-right" ng-class="{'score-success': score.split(':')[0] > score.split(':')[1]}">
+            {{score.split(':')[0]}}
+          </span>
+        </p>
+        <p ng-class="{'game-box-winner': game.winner === 2, 'game-box-loser': game.winner === 1}">
+          {{game.player2.username}} 
+          <span ng-if="game.scores.length" ng-repeat="score in game.scores.slice().reverse() track by $index" class="pull-right" ng-class="{'score-success': score.split(':')[1] > score.split(':')[0]}">
+            {{score.split(':')[1]}}
+          </span>
+        </p>
+      </div>
     </div>
 
+  </div>
+
+  <!-- winner column -->
+  <div class="col-xs-{{ 12 / (t.rounds.length+1) | number:0 }} diagram-column column-{{t.rounds.length}}">
+    <div class="diagram-game winner">
+      <div class="game-box">
+        <p>{{t.winner.username}}</p>
+      </div>
+    </div>
   </div>
 
 </div>

@@ -16,3 +16,27 @@ body {
 form.ng-submitted .ng-invalid {
     border-color: @error;
 }
+
+
+// modal score
+.modal-backdrop {
+  height: 100%;
+}
+.modal.score-popin {
+  .modal-dialog {
+    width: 400px;
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .text-right {
+      input {
+        text-align: right;
+      }
+    }
+    label {
+      height: 34px;
+      line-height: 34px;
+    }
+  }
+}

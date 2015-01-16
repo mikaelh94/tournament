@@ -9,7 +9,9 @@ angular.module('tournamentApp.tournamentModule')
         create: { method: 'POST' },
         start: { method: 'PUT', data: { rounds: '@rounds' } },
         addPlayer: { method: 'POST', params: { playerId: '@playerId' } },
-        removePlayer: { method: 'DELETE', params: { playerId: '@playerId' } }
+        removePlayer: { method: 'DELETE', params: { playerId: '@playerId' } },
+        reset: { method: 'PUT', params: { reset: '@reset' } },
+        setScores: { method: 'PUT', params: { scores: '@scores' } }
       });
 
     }
@@ -23,11 +25,6 @@ angular.module('tournamentApp.tournamentModule')
       return {
         knockOut: function(tournamentId, players) {
           var playersLength = players.length;
-
-          if ( !isPowerOfTwo(playersLength) ) {
-            console.log('Players count must be a power of two (2, 4, 8, 16, 32, etc...');
-            return;
-          }
 
           var sortedPlayers = players.sort(compare),
               roundsLength = Math.log(playersLength)/Math.log(2),
@@ -98,11 +95,6 @@ angular.module('tournamentApp.tournamentModule')
             });
             return out;
           }
-
-          // check if players count is 2, 4, 8 , 16, 32, etc...
-          function isPowerOfTwo(x) {
-            return (x != 0) && ((x & (x - 1)) == 0);
-          };
 
           // sort by points
           function compare(a,b) {

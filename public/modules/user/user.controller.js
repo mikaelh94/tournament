@@ -35,6 +35,8 @@ angular.module('tournamentApp.userModule')
                         function(response) {
                             if (!response.user && response.info) {
                                 $scope.registerError = response.info;
+                            } else {
+                                $state.go('home');
                             }
                         }
                     );

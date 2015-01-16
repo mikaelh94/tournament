@@ -1,0 +1,40 @@
+  <div class="modal-header">
+    <h3 class="modal-title">Set game result</h3>
+  </div>
+<form name="scorePopinForm" novalidate ng-submit="sendScores()" >
+  <div class="modal-body">
+      <div class="row">
+        <p class="col-sm-offset-4 col-sm-4 text-center">{{player1.username}} <span class="pull-right" ng-class="{'glyphicon glyphicon-thumbs-up text-success': winner === 1, 'glyphicon glyphicon-thumbs-down text-danger': winner === 2}"></span></p>
+        <p class="col-sm-4 text-center"><span class="pull-left" ng-class="{'glyphicon glyphicon-thumbs-up text-success': winner === 2, 'glyphicon glyphicon-thumbs-down text-danger': winner === 1}"></span> {{player2.username}}</p>
+      </div>
+      <div class="row" ng-repeat="i in totalMatchs() track by $index">
+        <label class="col-sm-4">Set {{$index + 1}}</label>
+        <div class="col-sm-4 text-right">
+          <input type="number" class="form-control" ng-model="scores[$index].player1" ng-change="checkWinner()" required id="score{{$index + 1}}Player1">
+        </div>
+        <div class="col-sm-4">
+          <input type="number" class="form-control" ng-model="scores[$index].player2" ng-change="checkWinner()" required id="score{{$index + 1}}Player2">
+        </div>
+      </div>
+
+      <div class="row" ng-if="matchToWin > 1">
+        <label class="col-sm-4">Set {{matchToWin + 1}}</label>
+        <div class="col-sm-4 text-right">
+          <input type="number" class="form-control" ng-model="scores[matchToWin].player1" ng-change="checkWinner()">
+        </div>
+        <div class="col-sm-4">
+          <input type="number" class="form-control" ng-model="scores[matchToWin].player2" ng-change="checkWinner()">
+        </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+
+    <div class="pull-left" ng-if="scorePopinForm.$submitted" ng-messages="scorePopinForm.$error">
+      <p class="help-block" ng-message="required">Fields are required</p>
+      <p class="help-block" ng-message="number">Numbers only...</p>
+    </div>
+
+    <button class="btn btn-primary" type="submit">OK</button>
+    <button class="btn btn-default" type="reset" ng-click="cancel()">Cancel</button>
+  </div>
+</form>

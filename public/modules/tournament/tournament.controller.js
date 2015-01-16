@@ -8,7 +8,10 @@ angular.module('tournamentApp.tournamentModule')
     'tournamentService',
     'tournamentGenerate',
     'tournament',
-    function($scope, $rootScope, $stateParams, $filter, tournamentService, tournamentGenerate, tournament){
+
+    'userService',
+    'authService',
+    function($scope, $rootScope, $stateParams, $filter, tournamentService, tournamentGenerate, tournament, userService, authService){
       $scope.t = tournament;
 
       $scope.isActive = ($scope.t.status === 'running');
@@ -50,9 +53,171 @@ angular.module('tournamentApp.tournamentModule')
         tournamentGenerate.knockOut(tournament._id, $scope.t.players).then(
           function(response) {
             $scope.t = response;
+            $scope.rounds = $scope.t.rounds;
             $scope.isActive = ($scope.t.status === 'running');
           }
         );
+      };
+
+      // check if tournament can start
+      $scope.$watch('t.players', function(pls) {
+        $scope.canStart = (typeof pls !== 'undefined' && pls.length >= 4 && isPowerOfTwo(pls.length));
+      });
+
+      // check if players count is 2, 4, 8 , 16, 32, etc...
+      function isPowerOfTwo(x) {
+        return (x != 0) && ((x & (x - 1)) == 0);
+      };
+
+      $scope.$watch('t.currentRound', function(currentRound) {
+        $scope.currentRoundLabel = setCurrentRoundLabel(currentRound);
+      });
+
+      var setCurrentRoundLabel = function(currentRound) {
+        var label = ''
+        switch (currentRound) {
+          case 0:
+            label = 'no active round';
+            break;
+          case 1:
+            label = 'final';
+            break;
+          case 2:
+            label = 'semi-final';
+            break;
+          case 3:
+            label = 'quarter-final';
+            break;
+          default:
+            label = '1/' + currentRound;
+            break;
+        }
+        return label;
+      };
+
+
+
+
+      /**
+       *  Dev only
+       ********************************************************************************/
+      
+      $scope.generatePlayer = function() {
+        var generateStr = function() {
+            var text = "";
+            var possible = "abcdefghijklmnopqrstuvwxyz";
+
+            for( var i=0; i < 4; i++ )
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        };
+
+        var username = generateStr(),
+            points = Math.floor((Math.random() * 300) + 1);
+
+        var newUser = {
+          username: username,
+          email: username+'@'+username+'.fr',
+          password: 'ppp'
+        }
+
+
+        authService.register(newUser).$promise.then(function(res) {
+          userService.setPoints({id: res.user._id, points: points});
+
+          $scope.players = userService.getAll();
+        });
+      };
+
+      $scope.players = userService.getAll();
+
+      $scope.subscribeTo = function(id) {
+        tournamentService.addPlayer({ id: tournament._id, playerId: id},
+          function(response) {
+            $scope.t = response;
+          }
+        );
+      };
+
+      $scope.resetTournament = function() {
+        tournamentService.reset({ id: tournament._id, reset: true}, function(res) {
+          $scope.isActive = false;
+          $scope.t = res;
+        });
+      };
+
+      /********************************************************************************/
+    }
+  ])
+
+  .controller('TournamentScorePopinCtrl', [
+    '$scope',
+    'tournamentService',
+    '$modalInstance',
+    'tournamentId',
+    'currentRoundId',
+    'currentGame',
+    'matchToWin',
+    function($scope, tournamentService, $modalInstance, tournamentId, currentRoundId, currentGame, matchToWin){
+
+      $scope.player1 = currentGame.player1;
+      $scope.player2 = currentGame.player2;
+      $scope.scores = [];
+      $scope.onlyNumbers = '/^\d+$/';
+      $scope.winner = 0;
+
+      $scope.matchToWin = matchToWin;
+
+      $scope.totalMatchs = function() {
+        var length = parseInt(matchToWin);
+        return new Array(length);
+      };
+
+      $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+      };
+
+      $scope.checkWinner = function() {
+        if ($scope.scorePopinForm.$pristine) {
+          $scope.winner = 0;
+          return;
+        }
+
+        var scores = $scope.scores,
+            usr1 = usr2 = 0;
+
+        for (var match in scores) {
+            usr1 += ( typeof scores[match].player1 === 'number') ? scores[match].player1 : 0;
+            usr2 += ( typeof scores[match].player2 === 'number') ? scores[match].player2 : 0;
+        }
+
+        if (usr1 === usr2) {
+          $scope.winner = 0;
+          return;
+        }
+        $scope.winner = (usr1 > usr2) ? 1 : 2;
+      };
+
+
+      $scope.sendScores = function() {
+        if ($scope.scorePopinForm.$invalid || $scope.winner === 0) { return; }
+
+        var winnerId = ($scope.winner === 1) ? currentGame.player1._id : currentGame.player2._id;
+
+        var scoresObj = {
+          roundId: currentRoundId,
+          gameId: currentGame._id,
+          scores: $scope.scores,
+          winner: $scope.winner,
+          winnerId: winnerId
+        };
+
+
+        tournamentService.setScores({ id: tournamentId, scores: scoresObj }, function(response) {
+          $modalInstance.close(response);
+        });
+
       };
     }
   ])
