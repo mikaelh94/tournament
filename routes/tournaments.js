@@ -61,7 +61,7 @@ module.exports = function() {
         tournament.winner = undefined;
       }
 
-      //set single game scores
+      //set single game scores (from score popin)
       if (req.body.scores) {
         var scoresObj = req.body.scores;
 
@@ -77,7 +77,7 @@ module.exports = function() {
 
         tournament.playersLeft = tournament.playersLeft-1;
 
-        // check if ounr is finished
+        // check if round is finished
         var isRoundOver = true;
         for (var i = 0, len = round.games.length; i < len; i++) {
            if (!round.games[i].winner) {
@@ -108,13 +108,11 @@ module.exports = function() {
           tournament.winner = scoresObj.winnerId;
           tournament.status = 'finished';
         }
-        
-
 
 
       }
 
-      // set start rounds
+      // set start rounds (diagram)
       if (req.body.rounds && tournament.status === 'pending') {
         var rounds = req.body.rounds;
 

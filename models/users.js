@@ -5,7 +5,7 @@ var UserSchema = new mongoose.Schema({
     email: { type: String, required: 'Email is required' },
     password: { type: String, required: 'Password is required', select: false },
     createdAt: { type: Date, default: Date.now, select: false },
-    points: { type: Number, default: 0 }
+    points: { type: Number, default: 500 }
 });
 
 mongoose.model('UserModel', UserSchema);

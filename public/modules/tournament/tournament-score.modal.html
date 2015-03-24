@@ -3,10 +3,14 @@
   </div>
 <form name="scorePopinForm" novalidate ng-submit="sendScores()" >
   <div class="modal-body">
+
+      <!-- players -->
       <div class="row">
         <p class="col-sm-offset-4 col-sm-4 text-center">{{player1.username}} <span class="pull-right" ng-class="{'glyphicon glyphicon-thumbs-up text-success': winner === 1, 'glyphicon glyphicon-thumbs-down text-danger': winner === 2}"></span></p>
         <p class="col-sm-4 text-center"><span class="pull-left" ng-class="{'glyphicon glyphicon-thumbs-up text-success': winner === 2, 'glyphicon glyphicon-thumbs-down text-danger': winner === 1}"></span> {{player2.username}}</p>
       </div>
+
+      <!-- games -->
       <div class="row" ng-repeat="i in totalMatchs() track by $index">
         <label class="col-sm-4">Set {{$index + 1}}</label>
         <div class="col-sm-4 text-right">
@@ -17,6 +21,7 @@
         </div>
       </div>
 
+      <!-- decisive game -->
       <div class="row" ng-if="matchToWin > 1">
         <label class="col-sm-4">Set {{matchToWin + 1}}</label>
         <div class="col-sm-4 text-right">
@@ -32,6 +37,7 @@
     <div class="pull-left" ng-if="scorePopinForm.$submitted" ng-messages="scorePopinForm.$error">
       <p class="help-block" ng-message="required">Fields are required</p>
       <p class="help-block" ng-message="number">Numbers only...</p>
+      <p class="help-block" ng-message="nowinner">A winner is required</p>
     </div>
 
     <button class="btn btn-primary" type="submit">OK</button>

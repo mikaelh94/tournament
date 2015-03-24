@@ -17,6 +17,56 @@ angular.module('tournamentApp.tournamentModule')
     }
   ])
 
+  /**
+   *  Calculate points for users after a game
+   *  based on FFTT rules ( http://www.fftt.com/sportif/pclassement/html/grille.htm )
+   */
+  .factory('tournamentCalculatePoints',[
+    function(){
+      return function(player1, player2, winner, totalRounds, currentRound) {
+        var normalWin  = [  6,  5.5,  5,  4,   3,     2,    1, 0.5,   0],
+            extraWin   = [  6,    7,  8, 10,  13,    17,   22,  28,  40],
+            normalLose = [ -5, -4.5, -4, -3,  -2,    -1, -0.5,   0,   0],
+            extraLose  = [ -5,   -6, -7, -8, -10, -12.5,  -16, -20, -29],
+            ranges = [
+              [0, 24], [25, 49], [50, 99], [100, 149], [150, 199], [200, 299], [300, 399], [400, 499], [500, 1000000]
+            ],
+            diff = Math.abs(player1.points - player2.points),
+            rangeIndex,
+            pts1 = 0,
+            pts2 = 0;
+
+        for (var i = 0, len = ranges.length; i < len; i++) {
+          if ( diff >= ranges[i][0] && diff <= ranges[i][1] ) {
+            rangeIndex = i;
+            break;
+          }
+        };
+        
+
+        if (player1.points > player2.points) {
+          if (winner === 1) {
+            pts1 = player1.points + normalWin[rangeIndex];
+            pts2 = player2.points + normalLose[rangeIndex];
+          } else {
+            pts1 = player1.points + extraLose[rangeIndex];
+            pts2 = player2.points + extraWin[rangeIndex];
+          }
+        } else {
+          if (winner === 1) {
+            pts1 = player1.points + extraWin[rangeIndex];
+            pts2 = player2.points + extraLose[rangeIndex];
+          } else {
+            pts1 = player1.points + normalLose[rangeIndex];
+            pts2 = player2.points + normalWin[rangeIndex];
+          }
+        }
+
+        return [pts1, pts2];
+      };
+    }
+  ])
+
   // tournament generation of matchs/rounds/pools 
   .factory('tournamentGenerate',[
     'tournamentService',

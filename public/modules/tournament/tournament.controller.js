@@ -114,7 +114,7 @@ angular.module('tournamentApp.tournamentModule')
         };
 
         var username = generateStr(),
-            points = Math.floor((Math.random() * 300) + 1);
+            points = Math.floor((Math.random() * 1000) + 1);
 
         var newUser = {
           username: username,
@@ -154,12 +154,14 @@ angular.module('tournamentApp.tournamentModule')
   .controller('TournamentScorePopinCtrl', [
     '$scope',
     'tournamentService',
+    'userService',
+    'tournamentCalculatePoints',
     '$modalInstance',
     'tournamentId',
     'currentRoundId',
     'currentGame',
     'matchToWin',
-    function($scope, tournamentService, $modalInstance, tournamentId, currentRoundId, currentGame, matchToWin){
+    function($scope, tournamentService, userService, tournamentCalculatePoints, $modalInstance, tournamentId, currentRoundId, currentGame, matchToWin){
 
       $scope.player1 = currentGame.player1;
       $scope.player2 = currentGame.player2;
@@ -194,29 +196,41 @@ angular.module('tournamentApp.tournamentModule')
 
         if (usr1 === usr2) {
           $scope.winner = 0;
+          $scope.scorePopinForm.$setValidity('nowinner', false);
           return;
         }
         $scope.winner = (usr1 > usr2) ? 1 : 2;
+        $scope.scorePopinForm.$setValidity('nowinner', true);
+        
       };
 
 
       $scope.sendScores = function() {
-        if ($scope.scorePopinForm.$invalid || $scope.winner === 0) { return; }
+
+        if ($scope.scorePopinForm.$invalid) return;
 
         var winnerId = ($scope.winner === 1) ? currentGame.player1._id : currentGame.player2._id;
+        var points = tournamentCalculatePoints($scope.player1, $scope.player2, $scope.winner);
 
         var scoresObj = {
           roundId: currentRoundId,
           gameId: currentGame._id,
           scores: $scope.scores,
           winner: $scope.winner,
-          winnerId: winnerId
+          winnerId: winnerId,
+          points: points
         };
 
-
-        tournamentService.setScores({ id: tournamentId, scores: scoresObj }, function(response) {
-          $modalInstance.close(response);
+        userService.setPoints({id: $scope.player1._id, points: points[0] }, function() {
+          userService.setPoints({id: $scope.player2._id, points: points[1] }, function() {
+            tournamentService.setScores({ id: tournamentId, scores: scoresObj }, function(response) {
+              $modalInstance.close(response);
+            });
+          });
         });
+
+
+        
 
       };
     }
